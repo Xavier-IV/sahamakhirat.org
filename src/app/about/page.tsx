@@ -9,8 +9,8 @@ export default function AboutPage() {
         <div className="prose max-w-none">
           <p>
             Saham Akhirat is a platform dedicated to showcasing and supporting
-            open-source projects that aim to benefit the Muslim community and
-            earn rewards in the afterlife (akhirah).
+            open-source or publicly accessible projects that aim to benefit the
+            Muslim community and earn rewards in the afterlife (akhirah).
           </p>
           <p>Our mission is to:</p>
           <ul>
