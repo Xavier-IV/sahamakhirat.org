@@ -1,5 +1,6 @@
 "use server";
 
+import { logtail } from "@/lib/logtail/server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -55,7 +56,11 @@ export async function updateProject(
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/join");
+  if (!user) {
+    logtail.warn("Unauthorized access attempt to update project.");
+    logtail.flush();
+    redirect("/join");
+  }
 
   // ✅ Validate form data
   const parsed = updateProjectSchema.safeParse({
@@ -68,6 +73,10 @@ export async function updateProject(
   });
 
   if (!parsed.success) {
+    logtail.warn("Project update validation failed", {
+      errors: parsed.error.format(),
+    });
+
     return {
       errors: Object.fromEntries(
         Object.entries(parsed.error.flatten().fieldErrors).map(
@@ -95,6 +104,7 @@ export async function updateProject(
     .single();
 
   if (fetchError) {
+    logtail.error("Failed to fetch project details", { fetchError });
     return {
       message: "Failed to fetch project details.",
     };
@@ -121,14 +131,15 @@ export async function updateProject(
         });
 
       if (uploadError) {
+        logtail.error("Image upload failed", { uploadError });
         return {
           message: "Image upload failed, keeping existing image.",
         };
       }
 
-      imageUrl = uploadData.path;
+      imageUrl = uploadData.path; // ✅ Store only the storage path
     } catch (error) {
-      console.error(error);
+      logtail.error("Error processing image file", { error });
       return {
         message: "Error processing image file, keeping existing image.",
       };
@@ -142,14 +153,22 @@ export async function updateProject(
       title: projectName,
       description: projectDescription,
       website: projectWebsite,
-      image_url: imageUrl,
+      image_url: imageUrl, // ✅ Store only the storage path
     })
     .eq("id", projectId)
     .eq("user_id", user.id);
 
   if (updateError) {
+    logtail.error("Failed to update project", { updateError });
     return { message: "Failed to update project." };
   }
 
+  logtail.info("Project updated successfully", {
+    projectId,
+    projectName,
+    userId: user.id,
+  });
+
+  logtail.flush();
   redirect("/dashboard");
 }

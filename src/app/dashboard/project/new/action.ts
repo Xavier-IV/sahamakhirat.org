@@ -1,5 +1,6 @@
 "use server";
 
+import { logtail } from "@/lib/logtail/server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -49,6 +50,11 @@ export async function createProject(
 ): Promise<CreateProjectState | void> {
   const supabase = await createClient();
 
+  logtail.info("Creating new project", {
+    formDataKeys: Array.from(formData.keys()),
+  });
+
+  // ✅ Validate input
   const parsed = projectSchema.safeParse({
     userId: formData.get("userId"),
     projectName: formData.get("projectName"),
@@ -67,6 +73,10 @@ export async function createProject(
   let imagePath: string | null = null; // ✅ Store only the storage path in DB
 
   if (!parsed.success) {
+    logtail.warn("Project validation failed", {
+      errors: parsed.error.flatten().fieldErrors,
+    });
+
     return {
       errors: Object.fromEntries(
         Object.entries(parsed.error.flatten().fieldErrors).map(
@@ -92,6 +102,11 @@ export async function createProject(
       const buffer = await image.arrayBuffer();
       const fileBlob = new Blob([buffer], { type: fileMimeType });
 
+      logtail.info("Uploading image to Supabase Storage", {
+        fileName,
+        fileMimeType,
+      });
+
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("project-images")
         .upload(fileName, fileBlob, {
@@ -101,6 +116,8 @@ export async function createProject(
         });
 
       if (uploadError) {
+        logtail.error("Image upload failed", { error: uploadError.message });
+
         return {
           errors: {
             image: "Image upload failed, using placeholder image instead.",
@@ -115,8 +132,11 @@ export async function createProject(
         .from("project-images")
         .getPublicUrl(imagePath);
       imageUrl = publicUrlData.publicUrl; // ✅ Get public URL for frontend preview
+
+      logtail.info("Image uploaded successfully", { imagePath, imageUrl });
     } catch (error) {
-      console.error(error);
+      logtail.error("Project: Unable to upload image", { error });
+
       return {
         errors: {
           image:
@@ -128,6 +148,7 @@ export async function createProject(
     }
   }
 
+  // ✅ Insert project into database
   const { error: insertError } = await supabase.from("projects").insert([
     {
       user_id: userId,
@@ -140,8 +161,13 @@ export async function createProject(
   ]);
 
   if (insertError) {
+    logtail.error("Project: Insert failed", { error: insertError.message });
+
     return { message: "Failed to create project.", values, imageUrl };
   }
 
+  logtail.info("Project created successfully", { projectName, userId });
+
+  logtail.flush();
   redirect("/dashboard");
 }

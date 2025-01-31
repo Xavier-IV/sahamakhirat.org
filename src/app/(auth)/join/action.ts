@@ -1,5 +1,6 @@
 "use server";
 
+import { logtail } from "@/lib/logtail/server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -27,9 +28,12 @@ export async function signUp(email: string, password: string) {
   const { error } = await supabase.auth.signUp(parsed.data);
 
   if (error) {
+    logtail.error("Auth: Unable to register", error);
+
     return { error: error.message };
   }
 
+  logtail.flush();
   redirect("/");
 }
 
@@ -47,8 +51,10 @@ export async function signIn(email: string, password: string) {
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
+    logtail.error("Auth: Unable to sign in", error);
     return { error: error.message };
   }
 
+  logtail.flush();
   redirect("/");
 }

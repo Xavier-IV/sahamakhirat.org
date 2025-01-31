@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { QueryData } from "@supabase/supabase-js";
 import Link from "next/link";
 import { Header } from "./components/header";
 import { ProjectCard } from "./components/project-card";
-import { QueryData } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
