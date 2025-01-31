@@ -59,7 +59,7 @@ export async function updateProject(
   if (!user) {
     logtail.warn("Unauthorized access attempt to update project.");
     logtail.flush();
-    redirect("/join");
+    redirect("/signin");
   }
 
   // ✅ Validate form data

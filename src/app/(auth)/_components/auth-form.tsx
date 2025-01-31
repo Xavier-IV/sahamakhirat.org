@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "../action";
-import { Turnstile } from "next-turnstile";
+import Turnstile from "react-turnstile";
 
 export function AuthForm({ type }: { type: "signin" | "signup" }) {
   const [loading, setLoading] = useState(false);
@@ -16,6 +16,10 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTurnstileToken(null); // Ensure Turnstile resets on mount
+  }, []);
 
   const handleAuth = async () => {
     setLoading(true);
@@ -59,6 +63,7 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
         />
         {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
       </div>
+
       {/* Password Field */}
       <div>
         <Input
@@ -71,13 +76,20 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
           <p className="text-red-500 text-sm">{errors.password}</p>
         )}
       </div>
-      {/* Cloudflare Turnstile CAPTCHA */}
+
+      {/* ✅ Cloudflare Turnstile (react-turnstile) */}
       <Turnstile
-        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-        onVerify={(token: string) => setTurnstileToken(token)}
+        sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        onVerify={(token) => setTurnstileToken(token)}
+        onError={() =>
+          setError("Turnstile validation failed. Please try again.")
+        }
+        onExpire={() => setTurnstileToken(null)} // Reset token on expiration
       />
+
       {/* General Error */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
+
       {/* Submit Button */}
       <Button onClick={handleAuth} disabled={loading} className="w-full">
         {loading ? "Processing..." : type === "signup" ? "Sign Up" : "Sign In"}

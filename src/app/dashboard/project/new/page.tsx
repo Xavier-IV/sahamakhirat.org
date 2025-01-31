@@ -11,7 +11,7 @@ export default async function NewProjectPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/join");
+  if (!user) redirect("/signin");
 
   return (
     <>

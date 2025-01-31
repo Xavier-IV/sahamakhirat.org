@@ -34,7 +34,7 @@ export async function Header() {
           </>
         ) : (
           <Button variant="outline" size="sm" asChild>
-            <Link href="/join">Join</Link>
+            <Link href="/signin">Join</Link>
           </Button>
         )}
       </div>
