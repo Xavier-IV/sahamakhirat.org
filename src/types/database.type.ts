@@ -116,6 +116,7 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          is_approved: boolean | null
           readme: string | null
           title: string
           updated_at: string
@@ -127,6 +128,7 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          is_approved?: boolean | null
           readme?: string | null
           title: string
           updated_at?: string
@@ -138,6 +140,7 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          is_approved?: boolean | null
           readme?: string | null
           title?: string
           updated_at?: string

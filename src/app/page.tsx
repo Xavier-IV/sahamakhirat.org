@@ -16,6 +16,7 @@ const projectsQuery = supabase
       count: "exact",
     },
   )
+  .eq("is_approved", true)
   .order("created_at", { ascending: true });
 
 export type ProjectsQuery = QueryData<typeof projectsQuery>;
