@@ -1,22 +1,52 @@
-import { Header } from "../../components/header"
-import { AvatarGroup } from "../../components/avatar-group"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { projects } from "../../data/projects"
+import { createClient } from "@/lib/supabase/client";
+import { Header } from "../../components/header";
+import { AvatarGroup } from "../../components/avatar-group";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
-export default async function ProjectPage({ params }: { params: { id: string } }) {
-  // TODO: Replace with Supabase query
-  const projectIndex = projects.findIndex((p) => p.id === params.id)
-  const project = projects[projectIndex]
-  const prevProject = projects[(projectIndex - 1 + projects.length) % projects.length]
-  const nextProject = projects[(projectIndex + 1) % projects.length]
+export default async function ProjectPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const supabase = createClient();
 
-  if (!project) {
-    return <div>Project not found</div>
+  // Fetch project by ID
+  const { data: project, error } = await supabase
+    .from("projects")
+    .select(
+      "id, title, description, image_url, website, readme, maintainers(*), contributors(*)",
+    )
+    .eq("id", params.id)
+    .single();
+
+  if (error || !project) {
+    return <div className="text-center text-red-500">Project not found</div>;
   }
+
+  // Fetch all project IDs to determine previous & next project
+  const { data: allProjects } = await supabase
+    .from("projects")
+    .select("id")
+    .order("id");
+
+  if (!allProjects) {
+    return (
+      <div className="text-center text-red-500">
+        Error loading project navigation
+      </div>
+    );
+  }
+
+  const projectIndex = allProjects.findIndex((p) => p.id === params.id);
+  const prevProject = projectIndex > 0 ? allProjects[projectIndex - 1] : null;
+  const nextProject =
+    projectIndex < allProjects.length - 1
+      ? allProjects[projectIndex + 1]
+      : null;
 
   return (
     <>
@@ -25,27 +55,27 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{project.title}</h1>
           <div className="flex space-x-4">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/project/${prevProject.id}`}>
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Previous
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/project/${nextProject.id}`}>
-                Next
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            {prevProject && (
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/project/${prevProject.id}`}>
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Previous
+                </Link>
+              </Button>
+            )}
+            {nextProject && (
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/project/${nextProject.id}`}>
+                  Next
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-2/3">
-            <div className="prose max-w-none">
-              {project.readme.split("\n").map((line, index) => (
-                <p key={index}>{line}</p>
-              ))}
-            </div>
+            <div className="prose max-w-none">{project.readme}</div>
           </div>
           <div className="lg:w-1/3">
             <div className="bg-muted p-6 rounded-lg">
@@ -54,14 +84,18 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                 <h3 className="font-medium mb-2">Maintainers</h3>
                 <AvatarGroup avatars={project.maintainers} />
                 {project.maintainers && project.maintainers.length > 5 && (
-                  <p className="text-sm text-muted-foreground mt-2">+{project.maintainers.length - 5} others</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    +{project.maintainers.length - 5} others
+                  </p>
                 )}
               </div>
               <div className="mb-4">
                 <h3 className="font-medium mb-2">Contributors</h3>
                 <AvatarGroup avatars={project.contributors} />
                 {project.contributors && project.contributors.length > 5 && (
-                  <p className="text-sm text-muted-foreground mt-2">+{project.contributors.length - 5} others</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    +{project.contributors.length - 5} others
+                  </p>
                 )}
               </div>
               <div className="mb-4">
@@ -81,6 +115,5 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         </div>
       </main>
     </>
-  )
+  );
 }
-

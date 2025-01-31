@@ -3,7 +3,7 @@ export const projects = [
     id: "1",
     title: "Islamic Prayer Times API",
     description: "An open-source API for accurate prayer times worldwide",
-    imageUrl: "/placeholder.svg?height=200&width=400&text=Prayer+Times+API",
+    imageUrl: "https://placehold.co/600x400",
     maintainers: Array(3)
       .fill(null)
       .map((_, i) => ({
@@ -22,8 +22,9 @@ export const projects = [
   {
     id: "2",
     title: "Quran Memorization App",
-    description: "A mobile app to help Muslims memorize the Quran with spaced repetition",
-    imageUrl: "/placeholder.svg?height=200&width=400&text=Quran+Memorization",
+    description:
+      "A mobile app to help Muslims memorize the Quran with spaced repetition",
+    imageUrl: "https://placehold.co/600x400",
     maintainers: Array(2)
       .fill(null)
       .map((_, i) => ({
@@ -42,8 +43,9 @@ export const projects = [
   {
     id: "3",
     title: "Halal Food Finder",
-    description: "A web app to locate halal restaurants and food products nearby",
-    imageUrl: "/placeholder.svg?height=200&width=400&text=Halal+Food+Finder",
+    description:
+      "A web app to locate halal restaurants and food products nearby",
+    imageUrl: "https://placehold.co/600x400",
     maintainers: Array(4)
       .fill(null)
       .map((_, i) => ({
@@ -62,8 +64,9 @@ export const projects = [
   {
     id: "4",
     title: "Islamic Finance Calculator",
-    description: "A tool for calculating zakat, inheritance, and Islamic financing options",
-    imageUrl: "/placeholder.svg?height=200&width=400&text=Finance+Calculator",
+    description:
+      "A tool for calculating zakat, inheritance, and Islamic financing options",
+    imageUrl: "https://placehold.co/600x400",
     maintainers: Array(2)
       .fill(null)
       .map((_, i) => ({
@@ -82,8 +85,9 @@ export const projects = [
   {
     id: "5",
     title: "Hadith Database",
-    description: "A comprehensive, searchable database of authenticated hadiths",
-    imageUrl: "/placeholder.svg?height=200&width=400&text=Hadith+Database",
+    description:
+      "A comprehensive, searchable database of authenticated hadiths",
+    imageUrl: "https://placehold.co/600x400",
     maintainers: Array(5)
       .fill(null)
       .map((_, i) => ({
@@ -102,8 +106,9 @@ export const projects = [
   {
     id: "6",
     title: "Muslim Community Forum",
-    description: "An open-source forum software tailored for Muslim communities",
-    imageUrl: "/placeholder.svg?height=200&width=400&text=Community+Forum",
+    description:
+      "An open-source forum software tailored for Muslim communities",
+    imageUrl: "https://placehold.co/600x400",
     maintainers: Array(3)
       .fill(null)
       .map((_, i) => ({
@@ -142,7 +147,8 @@ export const projects = [
   {
     id: "8",
     title: "Charity Donation Platform",
-    description: "A secure platform for managing and distributing charitable donations",
+    description:
+      "A secure platform for managing and distributing charitable donations",
     imageUrl: "/placeholder.svg?height=200&width=400&text=Charity+Platform",
     maintainers: Array(4)
       .fill(null)
@@ -182,7 +188,8 @@ export const projects = [
   {
     id: "10",
     title: "Muslim Travel Companion",
-    description: "A mobile app for Muslim travelers with prayer times, qibla direction, and halal food recommendations",
+    description:
+      "A mobile app for Muslim travelers with prayer times, qibla direction, and halal food recommendations",
     imageUrl: "/placeholder.svg?height=200&width=400&text=Travel+Companion",
     maintainers: Array(3)
       .fill(null)
@@ -202,7 +209,8 @@ export const projects = [
   {
     id: "11",
     title: "Islamic Education Platform",
-    description: "An online learning platform for Islamic studies and Arabic language",
+    description:
+      "An online learning platform for Islamic studies and Arabic language",
     imageUrl: "/placeholder.svg?height=200&width=400&text=Education+Platform",
     maintainers: Array(5)
       .fill(null)
@@ -222,7 +230,8 @@ export const projects = [
   {
     id: "12",
     title: "Mosque Finder",
-    description: "A web and mobile app to locate nearby mosques and prayer spaces",
+    description:
+      "A web and mobile app to locate nearby mosques and prayer spaces",
     imageUrl: "/placeholder.svg?height=200&width=400&text=Mosque+Finder",
     maintainers: Array(2)
       .fill(null)
@@ -239,23 +248,22 @@ export const projects = [
     website: "https://example.com/mosque-finder",
     readme: `# Mosque Finder\n\nLocate nearby mosques and prayer spaces...`,
   },
-]
+];
 
 // TODO: Implement Supabase pagination
 export async function getProjects(page: number, limit: number) {
-  const start = (page - 1) * limit
-  const end = start + limit
+  const start = (page - 1) * limit;
+  const end = start + limit;
   return {
     data: projects.slice(start, end),
     count: projects.length,
     page,
     limit,
-  }
+  };
 }
 
 // TODO: Replace with Supabase query
 export async function getUserProjects(userId: string) {
   // For now, return a subset of projects as if they belong to the user
-  return projects.slice(0, 5)
+  return projects.slice(0, 5);
 }
-
