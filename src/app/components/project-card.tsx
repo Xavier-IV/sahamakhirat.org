@@ -34,9 +34,9 @@ export async function ProjectCard({ project }: ProjectCardProps) {
           height={200}
           className="w-full object-cover h-48"
         />
-        <CardContent className="p-4">
+        <CardContent className="p-4 max-h-[200px] h-full overflow-hidden">
           <h3 className="font-semibold text-lg mb-2">{project.title}</h3>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground mb-4 truncate">
             {project.description}
           </p>
           <div className="space-y-2">
