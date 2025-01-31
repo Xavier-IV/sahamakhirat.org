@@ -1,5 +1,5 @@
-import { Header } from "../../components/header"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Header } from "../../components/header";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
@@ -36,6 +36,5 @@ export default function Loading() {
         </div>
       </main>
     </>
-  )
+  );
 }
-

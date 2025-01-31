@@ -1,36 +1,15 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { User } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import LogoutButton from "./logout-button";
 
-export function Header() {
-  const supabase = createClient();
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export async function Header() {
+  const supabase = await createClient();
 
   // Fetch authenticated user
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-      setLoading(false);
-    };
-
-    getUser();
-  }, [supabase.auth]);
-
-  // Logout function
-  const handleLogout = async () => {
-    setLoading(true);
-    await supabase.auth.signOut();
-    router.refresh(); // Refresh session
-    router.push("/join"); // Redirect to join page
-  };
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <header className="w-full py-4 px-6 flex justify-between items-center">
@@ -46,21 +25,12 @@ export function Header() {
         <Button variant="ghost" size="sm" asChild>
           <Link href="/about">About</Link>
         </Button>
-        {loading ? (
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        ) : user ? (
+        {user ? (
           <>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/dashboard">Dashboard</Link>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              disabled={loading}
-            >
-              {loading ? "Logging out..." : "Logout"}
-            </Button>
+            <LogoutButton />
           </>
         ) : (
           <Button variant="outline" size="sm" asChild>
