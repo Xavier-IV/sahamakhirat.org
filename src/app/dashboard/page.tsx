@@ -21,7 +21,9 @@ export default async function Dashboard() {
   // Fetch user's projects
   const { data: userProjects, error } = await supabase
     .from("projects")
-    .select("id, title, description, image_url, website, readme")
+    .select(
+      "id, title, description, image_url, website, readme, contributors(*), maintainers(*)",
+    )
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);

@@ -9,7 +9,7 @@ export type UpdateProjectState = {
     Record<"projectName" | "projectDescription" | "projectWebsite", string>
   >;
   message?: string;
-  values: {
+  values?: {
     projectName: string;
     projectDescription: string;
     projectWebsite: string;
@@ -20,9 +20,15 @@ export type UpdateProjectState = {
 const updateProjectSchema = z.object({
   userId: z.string().uuid(),
   projectId: z.string().uuid(),
-  projectName: z.string().min(3).max(30),
-  projectDescription: z.string().min(10).max(50),
-  projectWebsite: z.string().url(),
+  projectName: z
+    .string()
+    .min(3, "Project name must be at least 3 characters")
+    .max(30, "Project name must be at most 30 characters"),
+  projectDescription: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(50, "Description must be at most 50 characters"),
+  projectWebsite: z.string().url("Invalid website URL"),
 });
 
 export async function updateProject(
@@ -35,6 +41,8 @@ export async function updateProject(
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) redirect("/join");
+
   const parsed = updateProjectSchema.safeParse({
     userId: formData.get("userId"),
     projectId: formData.get("projectId"),
@@ -43,22 +51,26 @@ export async function updateProject(
     projectWebsite: formData.get("projectWebsite"),
   });
 
-  if (!user) redirect("/join");
-
   if (!parsed.success) {
     return {
-      errors: parsed.error.flatten().fieldErrors as any,
+      errors: Object.fromEntries(
+        Object.entries(parsed.error.flatten().fieldErrors).map(
+          ([key, value]) => [key, value?.[0] ?? ""],
+        ),
+      ) as UpdateProjectState["errors"],
       message: "Please fix the errors below.",
-      values: parsed.data,
+      values: {
+        projectName: formData.get("projectName") as string,
+        projectDescription: formData.get("projectDescription") as string,
+        projectWebsite: formData.get("projectWebsite") as string,
+      },
     };
   }
 
-  console.log(parsed.data);
-
-  const { userId, projectId, projectName, projectDescription, projectWebsite } =
+  const { projectId, projectName, projectDescription, projectWebsite } =
     parsed.data;
 
-  const { error } = await supabase
+  await supabase
     .from("projects")
     .update({
       title: projectName,

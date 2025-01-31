@@ -90,7 +90,7 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
           type="url"
           required
           className="max-w-md"
-          defaultValue={state.values.projectWebsite} // ✅ Keep previous value
+          defaultValue={state?.values.projectWebsite} // ✅ Keep previous value
         />
         {state?.errors?.projectWebsite && (
           <p className="text-red-500 text-sm">{state.errors.projectWebsite}</p>
@@ -128,9 +128,6 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
           Allah and to earn rewards in the Akhirah.
         </span>
       </label>
-      {state?.errors?.intention && (
-        <p className="text-red-500 text-sm">{state.errors.intention}</p>
-      )}
 
       {/* General Form Error */}
       {state?.message && (

@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { User } from "@supabase/supabase-js";
 
 export function Header() {
   const supabase = createClient();
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Fetch authenticated user
@@ -21,7 +22,7 @@ export function Header() {
     };
 
     getUser();
-  }, []);
+  }, [supabase.auth]);
 
   // Logout function
   const handleLogout = async () => {

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { Header } from "./components/header";
 import { ProjectCard } from "./components/project-card";
@@ -7,7 +7,7 @@ import { QueryData } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
-const supabase = await createClient();
+const supabase = createClient();
 const projectsQuery = supabase
   .from("projects")
   .select(

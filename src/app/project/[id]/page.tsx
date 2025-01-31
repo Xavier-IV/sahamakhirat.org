@@ -10,9 +10,10 @@ export const dynamic = "force-dynamic";
 export default async function ProjectPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const supabase = createClient();
+  const { id } = await params;
 
   // Fetch project by ID
   const { data: project, error } = await supabase
@@ -20,7 +21,7 @@ export default async function ProjectPage({
     .select(
       "id, title, description, image_url, website, readme, maintainers(*), contributors(*)",
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !project) {
@@ -41,7 +42,7 @@ export default async function ProjectPage({
     );
   }
 
-  const projectIndex = allProjects.findIndex((p) => p.id === params.id);
+  const projectIndex = allProjects.findIndex((p) => p.id === id);
   const prevProject = projectIndex > 0 ? allProjects[projectIndex - 1] : null;
   const nextProject =
     projectIndex < allProjects.length - 1

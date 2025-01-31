@@ -113,6 +113,7 @@ export async function createProject(
 
       imageUrl = uploadData.path;
     } catch (error) {
+      console.error(error);
       return {
         errors: {
           image:
