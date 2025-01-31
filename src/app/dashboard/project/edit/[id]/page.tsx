@@ -37,12 +37,28 @@ export default async function EditProjectPage({
     );
   }
 
+  // TODO: Fetch public image url here
+  let imageUrl = null;
+  if (project.image_url && !project.image_url.startsWith("http")) {
+    const { data } = supabase.storage
+      .from("project-images")
+      .getPublicUrl(project.image_url);
+
+    if (data?.publicUrl) {
+      imageUrl = data.publicUrl;
+    }
+  }
+
   return (
     <>
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Edit Project</h1>
-        <EditProjectForm userId={user.id} project={project} />
+        <EditProjectForm
+          userId={user.id}
+          project={project}
+          imageUrl={imageUrl}
+        />
       </main>
     </>
   );

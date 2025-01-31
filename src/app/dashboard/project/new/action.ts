@@ -9,6 +9,7 @@ export type CreateProjectState = {
   errors?: Partial<Record<keyof CreateProjectValues | "image", string>>;
   message?: string;
   values: CreateProjectValues;
+  imageUrl?: string; // ✅ Store the public URL before returning
 };
 
 type CreateProjectValues = {
@@ -23,11 +24,11 @@ const projectSchema = z.object({
   projectName: z
     .string()
     .min(3, "Project name must be at least 3 characters")
-    .max(30, "Project name must be less than 30 characters"),
+    .max(50, "Project name must be less than 50 characters"),
   projectDescription: z
     .string()
     .min(10, "Description must be at least 10 characters")
-    .max(50, "Description must be less than 50 characters"),
+    .max(1500, "Description must be less than 1500 characters"),
   projectWebsite: z.string().url("Invalid URL format"),
   image: z
     .any()
@@ -48,7 +49,6 @@ export async function createProject(
 ): Promise<CreateProjectState | void> {
   const supabase = await createClient();
 
-  // ✅ Parse input using Zod
   const parsed = projectSchema.safeParse({
     userId: formData.get("userId"),
     projectName: formData.get("projectName"),
@@ -63,28 +63,26 @@ export async function createProject(
     projectWebsite: formData.get("projectWebsite") as string,
   };
 
-  if (!parsed.success) {
-    // ✅ Convert `string[]` to `string` (only take first error message)
-    const fieldErrors = Object.fromEntries(
-      Object.entries(parsed.error.flatten().fieldErrors).map(([key, value]) => [
-        key,
-        value?.[0] || "", // Take first error message, default to empty string
-      ]),
-    ) as Partial<Record<keyof CreateProjectValues, string>>;
+  let imageUrl = prevState?.imageUrl || "https://placehold.co/400x200"; // ✅ Default preview image
+  let imagePath: string | null = null; // ✅ Store only the storage path in DB
 
+  if (!parsed.success) {
     return {
-      errors: fieldErrors,
+      errors: Object.fromEntries(
+        Object.entries(parsed.error.flatten().fieldErrors).map(
+          ([key, value]) => [key, value?.[0] || ""],
+        ),
+      ) as Partial<Record<keyof CreateProjectValues, string>>,
       message: "Please fix the errors below.",
       values,
+      imageUrl, // ✅ Preserve preview URL across failed submissions
     };
   }
 
   const { userId, projectName, projectDescription, projectWebsite, image } =
     parsed.data;
 
-  let imageUrl = "https://placehold.co/400x200"; // ✅ Default image
-
-  // ✅ Handle image upload only if it's valid
+  // ✅ Handle image upload only if a new image is provided
   if (image && image.size > 0) {
     try {
       const fileExt = image.name.split(".").pop() || "jpg";
@@ -108,10 +106,15 @@ export async function createProject(
             image: "Image upload failed, using placeholder image instead.",
           },
           values,
+          imageUrl,
         };
       }
 
-      imageUrl = uploadData.path;
+      imagePath = uploadData.path; // ✅ Store only the path
+      const { data: publicUrlData } = supabase.storage
+        .from("project-images")
+        .getPublicUrl(imagePath);
+      imageUrl = publicUrlData.publicUrl; // ✅ Get public URL for frontend preview
     } catch (error) {
       console.error(error);
       return {
@@ -120,6 +123,7 @@ export async function createProject(
             "Error processing image file, using placeholder image instead.",
         },
         values,
+        imageUrl,
       };
     }
   }
@@ -129,14 +133,14 @@ export async function createProject(
       user_id: userId,
       title: projectName,
       description: projectDescription,
-      image_url: imageUrl,
+      image_url: imagePath, // ✅ Store only the storage path
       website: projectWebsite,
       readme: `# ${projectName}\n\n${projectDescription}`,
     },
   ]);
 
   if (insertError) {
-    return { message: "Failed to create project.", values };
+    return { message: "Failed to create project.", values, imageUrl };
   }
 
   redirect("/dashboard");

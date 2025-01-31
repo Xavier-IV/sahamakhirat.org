@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createProject, CreateProjectState } from "./action";
-import { useState } from "react";
+import { useState, useEffect, startTransition } from "react";
+import Image from "next/image";
 
 const initialState: CreateProjectState | void = {
   errors: {},
@@ -16,6 +17,7 @@ const initialState: CreateProjectState | void = {
     projectDescription: "",
     projectWebsite: "",
   },
+  imageUrl: "https://placehold.co/400x200", // ✅ Default preview
 };
 
 type NewProjectFormProps = {
@@ -27,8 +29,17 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
     createProject,
     initialState,
   );
+
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>(
+    state?.imageUrl || "https://placehold.co/400x200",
+  );
+
+  // ✅ Update preview image if form state changes
+  useEffect(() => {
+    setPreviewUrl(state?.imageUrl || "https://placehold.co/400x200");
+  }, [state?.imageUrl]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
@@ -39,11 +50,28 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
     } else {
       setFileError(null);
       setFile(selectedFile);
+      if (selectedFile) {
+        setPreviewUrl(URL.createObjectURL(selectedFile));
+      }
     }
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    if (file) {
+      formData.append("image", file, file.name); // ✅ Re-append file if exists
+    }
+
+    // ✅ Use startTransition to ensure the action is properly dispatched
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
+
   return (
-    <form action={formAction} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <input type="hidden" name="userId" value={userId} />
 
       {/* Project Name */}
@@ -55,7 +83,7 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
           name="projectName"
           required
           className="max-w-md"
-          defaultValue={state?.values.projectName} // ✅ Keep previous value
+          defaultValue={state?.values.projectName}
         />
         {state?.errors?.projectName && (
           <p className="text-red-500 text-sm">{state.errors.projectName}</p>
@@ -71,7 +99,7 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
           name="projectDescription"
           required
           className="max-w-md"
-          defaultValue={state?.values.projectDescription} // ✅ Keep previous value
+          defaultValue={state?.values.projectDescription}
         />
         {state?.errors?.projectDescription && (
           <p className="text-red-500 text-sm">
@@ -90,30 +118,34 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
           type="url"
           required
           className="max-w-md"
-          defaultValue={state?.values.projectWebsite} // ✅ Keep previous value
+          defaultValue={state?.values.projectWebsite}
         />
         {state?.errors?.projectWebsite && (
           <p className="text-red-500 text-sm">{state.errors.projectWebsite}</p>
         )}
       </div>
 
-      {/* Project Image */}
+      {/* Project Image + Preview */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Image
         </label>
-        <Input
-          type="file"
-          name="image"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="max-w-md"
-        />
-        {file && (
-          <p className="mt-2 text-sm text-gray-500">
-            Selected file: {file.name}
-          </p>
-        )}
+        <div className="flex flex-col gap-4">
+          <Image
+            src={previewUrl}
+            alt="Project Preview"
+            width={200}
+            height={100}
+            className="rounded border object-cover"
+          />
+          <Input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="max-w-md"
+          />
+        </div>
         {fileError && <p className="text-red-500 text-sm">{fileError}</p>}
         {state?.errors?.image && (
           <p className="text-red-500 text-sm">{state.errors.image}</p>

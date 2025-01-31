@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionState } from "react";
 import { updateProject, UpdateProjectState } from "./action";
+import { useState } from "react";
+import Image from "next/image";
 
 const initialState: UpdateProjectState = {
   errors: {},
@@ -18,25 +20,57 @@ const initialState: UpdateProjectState = {
 
 type EditProjectFormProps = {
   userId: string;
+  imageUrl: string | null;
   project: {
     id: string;
     title: string;
     description: string;
     website: string;
+    image_url: string;
   };
 };
 
-export function EditProjectForm({ userId, project }: EditProjectFormProps) {
+export function EditProjectForm({
+  userId,
+  project,
+  imageUrl,
+}: EditProjectFormProps) {
   const [state, formAction, pending] = useActionState(
     updateProject,
     initialState,
   );
+  const [previewImage, setPreviewImage] = useState(imageUrl);
+  const [, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0] || null;
+
+    if (selectedFile && selectedFile.size > 5 * 1024 * 1024) {
+      setFileError("File must be 5MB or less");
+      setFile(null);
+      return;
+    }
+
+    setFileError(null);
+    setFile(selectedFile);
+
+    // Show preview of new image
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
   return (
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="userId" value={userId} />
       <input type="hidden" name="projectId" value={project.id} />
 
+      {/* Project Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Name
@@ -52,6 +86,7 @@ export function EditProjectForm({ userId, project }: EditProjectFormProps) {
         )}
       </div>
 
+      {/* Project Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Description
@@ -69,6 +104,7 @@ export function EditProjectForm({ userId, project }: EditProjectFormProps) {
         )}
       </div>
 
+      {/* Project Website */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Website
@@ -85,6 +121,34 @@ export function EditProjectForm({ userId, project }: EditProjectFormProps) {
         )}
       </div>
 
+      {/* Project Image Preview + Upload */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Project Image
+        </label>
+        <div className="mb-4">
+          <Image
+            src={previewImage || "/placeholder.svg"}
+            alt="Project Image"
+            width={400}
+            height={200}
+            className="rounded-md border border-gray-300"
+          />
+        </div>
+        <Input
+          type="file"
+          name="image"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="max-w-md"
+        />
+        {fileError && <p className="text-red-500 text-sm">{fileError}</p>}
+        {state?.errors?.image && (
+          <p className="text-red-500 text-sm">{state.errors.image}</p>
+        )}
+      </div>
+
+      {/* General Form Error */}
       {state?.message && (
         <p className="text-red-500 text-sm">{state.message}</p>
       )}
