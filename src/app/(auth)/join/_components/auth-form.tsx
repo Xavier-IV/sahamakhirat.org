@@ -4,16 +4,6 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "../action";
-import { z } from "zod";
-
-// ✅ Define Zod Schema for Client-Side Validation
-const authSchema = z.object({
-  email: z.string().email("Invalid email format"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters long")
-    .max(50, "Password must be at most 50 characters long"),
-});
 
 export function AuthForm({ type }: { type: "signin" | "signup" }) {
   const [loading, setLoading] = useState(false);
