@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "../action";
-import Script from "next/script";
+import { Turnstile } from "next-turnstile";
 
 export function AuthForm({ type }: { type: "signin" | "signup" }) {
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,6 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
     email: "",
     password: "",
   });
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -43,7 +42,6 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
           password: response.error.password?._errors?.[0] || "",
         });
       }
-
       setLoading(false);
       return;
     }
@@ -51,12 +49,6 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
 
   return (
     <div className="space-y-4">
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        async
-        defer
-      />
-
       {/* Email Field */}
       <div>
         <Input
@@ -67,7 +59,6 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
         />
         {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
       </div>
-
       {/* Password Field */}
       <div>
         <Input
@@ -80,17 +71,13 @@ export function AuthForm({ type }: { type: "signin" | "signup" }) {
           <p className="text-red-500 text-sm">{errors.password}</p>
         )}
       </div>
-
       {/* Cloudflare Turnstile CAPTCHA */}
-      <div
-        className="cf-turnstile"
-        data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-        data-callback={(token: string) => setTurnstileToken(token)}
+      <Turnstile
+        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        onVerify={(token: string) => setTurnstileToken(token)}
       />
-
       {/* General Error */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
-
       {/* Submit Button */}
       <Button onClick={handleAuth} disabled={loading} className="w-full">
         {loading ? "Processing..." : type === "signup" ? "Sign Up" : "Sign In"}
