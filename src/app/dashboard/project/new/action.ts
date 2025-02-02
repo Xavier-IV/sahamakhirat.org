@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-// ✅ Define TypeScript types
 export type CreateProjectState = {
   errors?: Partial<Record<keyof CreateProjectValues | "image", string>>;
   message?: string;
@@ -17,6 +16,7 @@ type CreateProjectValues = {
   projectName: string;
   projectDescription: string;
   projectWebsite: string;
+  projectReadme: string;
 };
 
 // ✅ Define Zod schema for validation
@@ -30,6 +30,7 @@ const projectSchema = z.object({
     .string()
     .min(10, "Description must be at least 10 characters")
     .max(1500, "Description must be less than 1500 characters"),
+  projectReadme: z.string().optional(),
   projectWebsite: z.string().url("Invalid URL format"),
   image: z
     .any()
@@ -59,6 +60,7 @@ export async function createProject(
     userId: formData.get("userId"),
     projectName: formData.get("projectName"),
     projectDescription: formData.get("projectDescription"),
+    projectReadme: formData.get("projectReadme"),
     projectWebsite: formData.get("projectWebsite"),
     image: formData.get("image") as File | null,
   });
@@ -67,6 +69,7 @@ export async function createProject(
     projectName: formData.get("projectName") as string,
     projectDescription: formData.get("projectDescription") as string,
     projectWebsite: formData.get("projectWebsite") as string,
+    projectReadme: formData.get("projectWebsite") as string,
   };
 
   let imageUrl = prevState?.imageUrl || "https://placehold.co/400x200"; // ✅ Default preview image
@@ -89,8 +92,14 @@ export async function createProject(
     };
   }
 
-  const { userId, projectName, projectDescription, projectWebsite, image } =
-    parsed.data;
+  const {
+    userId,
+    projectName,
+    projectDescription,
+    projectReadme,
+    projectWebsite,
+    image,
+  } = parsed.data;
 
   // ✅ Handle image upload only if a new image is provided
   if (image && image.size > 0) {
@@ -156,7 +165,7 @@ export async function createProject(
       description: projectDescription,
       image_url: imagePath, // ✅ Store only the storage path
       website: projectWebsite,
-      readme: `# ${projectName}\n\n${projectDescription}`,
+      readme: projectReadme,
     },
   ]);
 

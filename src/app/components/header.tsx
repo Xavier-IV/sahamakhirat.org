@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
+import { LucideGithub } from "lucide-react";
 import Link from "next/link";
 import LogoutButton from "./logout-button";
 
 export async function Header() {
   const supabase = await createClient();
 
-  // Fetch authenticated user
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -22,6 +22,16 @@ export async function Header() {
         </p>
       </div>
       <div className="flex items-center space-x-4">
+        <Button variant="ghost" size="icon" asChild>
+          <Link
+            href="https://github.com/Xavier-IV/sahamakhirat.org"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <LucideGithub className="h-5 w-5" />
+          </Link>
+        </Button>
+
         <Button variant="ghost" size="sm" asChild>
           <Link href="/about">About</Link>
         </Button>

@@ -8,7 +8,11 @@ import { z } from "zod";
 export type UpdateProjectState = {
   errors?: Partial<
     Record<
-      "projectName" | "projectDescription" | "projectWebsite" | "image",
+      | "projectName"
+      | "projectDescription"
+      | "projectWebsite"
+      | "image"
+      | "projectReadme",
       string
     >
   >;
@@ -17,10 +21,10 @@ export type UpdateProjectState = {
     projectName: string;
     projectDescription: string;
     projectWebsite: string;
+    projectReadme: string;
   };
 };
 
-// ✅ Define validation schema
 const updateProjectSchema = z.object({
   userId: z.string().uuid(),
   projectId: z.string().uuid(),
@@ -33,6 +37,7 @@ const updateProjectSchema = z.object({
     .min(10, "Description must be at least 10 characters")
     .max(1500, "Description must be at most 1500 characters"),
   projectWebsite: z.string().url("Invalid website URL"),
+  projectReadme: z.string().optional(),
   image: z
     .any()
     .optional()
@@ -62,13 +67,13 @@ export async function updateProject(
     redirect("/signin");
   }
 
-  // ✅ Validate form data
   const parsed = updateProjectSchema.safeParse({
     userId: formData.get("userId"),
     projectId: formData.get("projectId"),
     projectName: formData.get("projectName"),
     projectDescription: formData.get("projectDescription"),
     projectWebsite: formData.get("projectWebsite"),
+    projectReadme: formData.get("projectReadme"),
     image: formData.get("image") as File | null,
   });
 
@@ -88,14 +93,20 @@ export async function updateProject(
         projectName: formData.get("projectName") as string,
         projectDescription: formData.get("projectDescription") as string,
         projectWebsite: formData.get("projectWebsite") as string,
+        projectReadme: formData.get("projectReadme") as string,
       },
     };
   }
 
-  const { projectId, projectName, projectDescription, projectWebsite, image } =
-    parsed.data;
+  const {
+    projectId,
+    projectName,
+    projectDescription,
+    projectWebsite,
+    projectReadme,
+    image,
+  } = parsed.data;
 
-  // ✅ Get existing project to preserve image if no new image is uploaded
   const { data: existingProject, error: fetchError } = await supabase
     .from("projects")
     .select("image_url")
@@ -110,9 +121,8 @@ export async function updateProject(
     };
   }
 
-  let imageUrl = existingProject.image_url; // Keep existing image
+  let imageUrl = existingProject.image_url;
 
-  // ✅ Upload new image if a file is provided
   if (image && image.size > 0) {
     try {
       const fileExt = image.name.split(".").pop() || "jpg";
@@ -137,7 +147,7 @@ export async function updateProject(
         };
       }
 
-      imageUrl = uploadData.path; // ✅ Store only the storage path
+      imageUrl = uploadData.path;
     } catch (error) {
       logtail.error("Error processing image file", { error });
       return {
@@ -146,14 +156,14 @@ export async function updateProject(
     }
   }
 
-  // ✅ Update project in database
   const { error: updateError } = await supabase
     .from("projects")
     .update({
       title: projectName,
       description: projectDescription,
       website: projectWebsite,
-      image_url: imageUrl, // ✅ Store only the storage path
+      image_url: imageUrl,
+      readme: projectReadme,
     })
     .eq("id", projectId)
     .eq("user_id", user.id);

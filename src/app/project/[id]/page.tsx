@@ -1,9 +1,11 @@
-import { createClient } from "@/lib/supabase/client";
-import { Header } from "../../components/header";
-import { AvatarGroup } from "../../components/avatar-group";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
+import { AvatarGroup } from "../../components/avatar-group";
+import { Header } from "../../components/header";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,6 @@ export default async function ProjectPage({
   const supabase = createClient();
   const { id } = await params;
 
-  // Fetch project by ID
   const { data: project, error } = await supabase
     .from("projects")
     .select(
@@ -28,7 +29,6 @@ export default async function ProjectPage({
     return <div className="text-center text-red-500">Project not found</div>;
   }
 
-  // Fetch all project IDs to determine previous & next project
   const { data: allProjects } = await supabase
     .from("projects")
     .select("id")
@@ -74,30 +74,26 @@ export default async function ProjectPage({
             )}
           </div>
         </div>
+
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-2/3">
-            <div className="prose max-w-none">{project.readme}</div>
+            <div className="prose max-w-none">
+              <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+                {project.readme || "No README provided."}
+              </ReactMarkdown>
+            </div>
           </div>
+
           <div className="lg:w-1/3">
             <div className="bg-muted p-6 rounded-lg">
               <h2 className="text-xl font-semibold mb-4">Project Details</h2>
               <div className="mb-4">
                 <h3 className="font-medium mb-2">Maintainers</h3>
                 <AvatarGroup avatars={project.maintainers} />
-                {project.maintainers && project.maintainers.length > 5 && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    +{project.maintainers.length - 5} others
-                  </p>
-                )}
               </div>
               <div className="mb-4">
                 <h3 className="font-medium mb-2">Contributors</h3>
                 <AvatarGroup avatars={project.contributors} />
-                {project.contributors && project.contributors.length > 5 && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    +{project.contributors.length - 5} others
-                  </p>
-                )}
               </div>
               <div className="mb-4">
                 <h3 className="font-medium mb-2">Website</h3>
