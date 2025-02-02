@@ -16,8 +16,9 @@ const initialState: CreateProjectState | void = {
     projectName: "",
     projectDescription: "",
     projectWebsite: "",
+    projectReadme: "",
   },
-  imageUrl: "https://placehold.co/400x200", // ✅ Default preview
+  imageUrl: "https://placehold.co/400x200",
 };
 
 type NewProjectFormProps = {
@@ -36,7 +37,6 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
     state?.imageUrl || "https://placehold.co/400x200",
   );
 
-  // ✅ Update preview image if form state changes
   useEffect(() => {
     setPreviewUrl(state?.imageUrl || "https://placehold.co/400x200");
   }, [state?.imageUrl]);
@@ -61,10 +61,9 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
     const formData = new FormData(event.currentTarget);
 
     if (file) {
-      formData.append("image", file, file.name); // ✅ Re-append file if exists
+      formData.append("image", file, file.name);
     }
 
-    // ✅ Use startTransition to ensure the action is properly dispatched
     startTransition(() => {
       formAction(formData);
     });
@@ -74,7 +73,6 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <input type="hidden" name="userId" value={userId} />
 
-      {/* Project Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Name
@@ -90,7 +88,6 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
         )}
       </div>
 
-      {/* Project Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Description
@@ -108,7 +105,6 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
         )}
       </div>
 
-      {/* Project Website */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Website
@@ -125,7 +121,6 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
         )}
       </div>
 
-      {/* Project Image + Preview */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Image
@@ -152,7 +147,22 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
         )}
       </div>
 
-      {/* Confirmation Checkbox */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Project Readme (Markdown)
+        </label>
+        <Textarea
+          name="projectReadme"
+          className="max-w-md"
+          placeholder="Paste your project README in markdown format here..."
+          rows={10}
+          defaultValue={state?.values.projectReadme}
+        />
+        {state?.errors?.projectReadme && (
+          <p className="text-red-500 text-sm">{state.errors.projectReadme}</p>
+        )}
+      </div>
+
       <label className="flex text-sm text-gray-900 gap-2 max-w-md">
         <Checkbox name="intention" required className="mt-0.5" />
         <span>
@@ -161,14 +171,15 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
         </span>
       </label>
 
-      {/* General Form Error */}
       {state?.message && (
         <p className="text-red-500 text-sm">{state.message}</p>
       )}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Submitting..." : "Submit Project"}
-      </Button>
+      <div className="w-full max-w-md flex items-end justify-end pt-4">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Submitting..." : "Submit Project"}
+        </Button>
+      </div>
     </form>
   );
 }

@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { useActionState, useState } from "react";
 import { updateProject, UpdateProjectState } from "./action";
+import Link from "next/link";
 
 const initialState: UpdateProjectState = {
   errors: {},
@@ -14,6 +15,7 @@ const initialState: UpdateProjectState = {
     projectName: "",
     projectDescription: "",
     projectWebsite: "",
+    projectReadme: "",
   },
 };
 
@@ -26,6 +28,7 @@ type EditProjectFormProps = {
     description: string;
     website: string;
     image_url: string;
+    readme: string;
   };
 };
 
@@ -54,7 +57,6 @@ export function EditProjectForm({
     setFileError(null);
     setFile(selectedFile);
 
-    // Show preview of new image
     if (selectedFile) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -69,7 +71,6 @@ export function EditProjectForm({
       <input type="hidden" name="userId" value={userId} />
       <input type="hidden" name="projectId" value={project.id} />
 
-      {/* Project Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Name
@@ -85,7 +86,6 @@ export function EditProjectForm({
         )}
       </div>
 
-      {/* Project Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Description
@@ -103,7 +103,6 @@ export function EditProjectForm({
         )}
       </div>
 
-      {/* Project Website */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Website
@@ -120,7 +119,6 @@ export function EditProjectForm({
         )}
       </div>
 
-      {/* Project Image Preview + Upload */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Project Image
@@ -147,14 +145,33 @@ export function EditProjectForm({
         )}
       </div>
 
-      {/* General Form Error */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Project README (Markdown)
+        </label>
+        <Textarea
+          name="projectReadme"
+          className="max-w-md"
+          defaultValue={project.readme}
+          rows={10}
+        />
+        {state?.errors?.projectReadme && (
+          <p className="text-red-500 text-sm">{state.errors.projectReadme}</p>
+        )}
+      </div>
+
       {state?.message && (
         <p className="text-red-500 text-sm">{state.message}</p>
       )}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Updating..." : "Update Project"}
-      </Button>
+      <div className="flex gap-2 w-full max-w-md items-end justify-end pt-4">
+        <Button variant="secondary" asChild>
+          <Link href={`/dashboard`}>Cancel</Link>
+        </Button>
+        <Button type="submit" disabled={pending}>
+          {pending ? "Updating..." : "Update Project"}
+        </Button>
+      </div>
     </form>
   );
 }
