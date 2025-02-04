@@ -3,10 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import Image from "next/image";
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { updateProject, UpdateProjectState } from "./action";
-import Link from "next/link";
 
 const initialState: UpdateProjectState = {
   errors: {},

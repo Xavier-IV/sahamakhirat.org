@@ -1,13 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { createProject, CreateProjectState } from "./action";
-import { useState, useEffect, startTransition } from "react";
-import Image from "next/image";
 
 const initialState: CreateProjectState | void = {
   errors: {},
