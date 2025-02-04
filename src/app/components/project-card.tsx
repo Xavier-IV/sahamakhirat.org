@@ -27,7 +27,7 @@ export async function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link href={`/project/${project?.id}`}>
       <Card className="overflow-hidden shadow-none">
-        <Image
+        <img
           src={imageUrl || "https://placehold.co/600x400"}
           alt={project?.title}
           width={400}

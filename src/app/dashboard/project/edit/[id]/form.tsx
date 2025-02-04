@@ -124,7 +124,7 @@ export function EditProjectForm({
           Project Image
         </label>
         <div className="mb-4">
-          <Image
+          <img
             src={previewImage || "/placeholder.svg"}
             alt="Project Image"
             width={400}

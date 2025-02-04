@@ -126,7 +126,7 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
           Project Image
         </label>
         <div className="flex flex-col gap-4">
-          <Image
+          <img
             src={previewUrl}
             alt="Project Preview"
             width={200}
