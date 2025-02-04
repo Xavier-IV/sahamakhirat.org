@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   output: "standalone",
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   /* config options here */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [
