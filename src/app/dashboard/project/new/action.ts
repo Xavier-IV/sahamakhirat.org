@@ -139,7 +139,7 @@ export async function createProject(
       imagePath = uploadData.path; // ✅ Store only the path
       const { data: publicUrlData } = supabase.storage
         .from("project-images")
-        .getPublicUrl(imagePath);
+        .getPublicUrl(imagePath, { transform: { quality: 40 } });
       imageUrl = publicUrlData.publicUrl; // ✅ Get public URL for frontend preview
 
       logtail.info("Image uploaded successfully", { imagePath, imageUrl });

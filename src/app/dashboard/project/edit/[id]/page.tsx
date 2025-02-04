@@ -42,7 +42,7 @@ export default async function EditProjectPage({
   if (project.image_url && !project.image_url.startsWith("http")) {
     const { data } = supabase.storage
       .from("project-images")
-      .getPublicUrl(project.image_url);
+      .getPublicUrl(project.image_url, { transform: { quality: 40 } });
 
     if (data?.publicUrl) {
       imageUrl = data.publicUrl;
