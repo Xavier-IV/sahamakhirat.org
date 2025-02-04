@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { updateProject, UpdateProjectState } from "./action";
+import Image from "next/image";
 
 const initialState: UpdateProjectState = {
   errors: {},
@@ -123,7 +124,7 @@ export function EditProjectForm({
           Project Image
         </label>
         <div className="mb-4">
-          <img
+          <Image
             src={previewImage || "/placeholder.svg"}
             alt="Project Image"
             width={400}

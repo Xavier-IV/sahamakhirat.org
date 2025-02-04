@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { ProjectsQuery } from "../page";
 import { AvatarGroup } from "./avatar-group";
+import Image from "next/image";
 
 type ProjectCardProps = {
   project: ProjectsQuery[number];
@@ -26,7 +27,7 @@ export async function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link href={`/project/${project?.id}`}>
       <Card className="overflow-hidden shadow-none">
-        <img
+        <Image
           src={imageUrl || "https://placehold.co/600x400"}
           alt={project?.title}
           width={400}

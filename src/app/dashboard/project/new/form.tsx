@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { createProject, CreateProjectState } from "./action";
+import Image from "next/image";
 
 const initialState: CreateProjectState | void = {
   errors: {},
@@ -124,7 +125,7 @@ export function NewProjectForm({ userId }: NewProjectFormProps) {
           Project Image
         </label>
         <div className="flex flex-col gap-4">
-          <img
+          <Image
             src={previewUrl}
             alt="Project Preview"
             width={200}
