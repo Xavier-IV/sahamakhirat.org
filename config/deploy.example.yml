@@ -1,0 +1,35 @@
+service: sahamakhirat-org
+
+image: user/image-name
+
+servers:
+  web:
+    - 192.168.0.1
+
+proxy:
+  ssl: true
+  host: sahamakhirat.org
+  app_port: 3100
+  forward_headers: true
+  healthcheck:
+    path: "/"
+
+registry:
+  username: user
+
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+
+env:
+  secret:
+    - NEXT_PUBLIC_LOGTAIL_TOKEN
+    - NEXT_PUBLIC_LOGTAIL_ENDPOINT
+    - NEXT_PUBLIC_TURNSTILE_SITE_KEY
+    - SUPABASE_URL
+    - SUPABASE_ANON_KEY
+    - LOGTAIL_SERVER_TOKEN
+    - LOGTAIL_SERVER_ENDPOINT
+    - TURNSTILE_SECRET_KEY
