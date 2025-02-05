@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
+import rehypeRaw from "rehype-raw";
 import { AvatarGroup } from "../../components/avatar-group";
 import { Header } from "../../components/header";
 
@@ -78,7 +79,53 @@ export default async function ProjectPage({
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-2/3">
             <div className="prose max-w-none">
-              <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+              <ReactMarkdown
+                rehypePlugins={[
+                  rehypeRaw,
+                  [
+                    rehypeSanitize,
+                    {
+                      tagNames: [
+                        "b",
+                        "i",
+                        "em",
+                        "strong",
+                        "a",
+                        "p",
+                        "ul",
+                        "ol",
+                        "li",
+                        "code",
+                        "pre",
+                        "blockquote",
+                        "h1",
+                        "h2",
+                        "h3",
+                        "h4",
+                        "h5",
+                        "h6",
+                        "br",
+                        "hr",
+                        "img", // ✅ Allow <img> tags
+                      ],
+                      attributes: {
+                        a: ["href", "title", "target", "rel"],
+                        img: [
+                          "src",
+                          "alt",
+                          "title",
+                          "width",
+                          "height",
+                          "loading",
+                        ], // ✅ Allow safe attributes for images
+                      },
+                      protocols: {
+                        src: ["http", "https", "data"], // ✅ Support HTTP, HTTPS, and data URIs
+                      },
+                    },
+                  ],
+                ]}
+              >
                 {project.readme || "No README provided."}
               </ReactMarkdown>
             </div>
