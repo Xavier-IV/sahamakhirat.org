@@ -33,6 +33,7 @@ export default async function ProjectPage({
   const { data: allProjects } = await supabase
     .from("projects")
     .select("id")
+    .eq("is_approved", true)
     .order("id");
 
   if (!allProjects) {
