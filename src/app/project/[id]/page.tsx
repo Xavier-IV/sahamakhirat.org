@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -7,6 +6,7 @@ import rehypeSanitize from "rehype-sanitize";
 import rehypeRaw from "rehype-raw";
 import { AvatarGroup } from "../../components/avatar-group";
 import { Header } from "../../components/header";
+import { getAllProjects, getOneProject } from "@/lib/queries/project";
 
 export const dynamic = "force-dynamic";
 
@@ -15,26 +15,14 @@ export default async function ProjectPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const supabase = createClient();
   const { id } = await params;
-
-  const { data: project, error } = await supabase
-    .from("projects")
-    .select(
-      "id, title, description, image_url, website, readme, maintainers(*), contributors(*)",
-    )
-    .eq("id", id)
-    .single();
+  const { data: project, error } = await getOneProject(id);
 
   if (error || !project) {
     return <div className="text-center text-red-500">Project not found</div>;
   }
 
-  const { data: allProjects } = await supabase
-    .from("projects")
-    .select("id")
-    .eq("is_approved", true)
-    .order("id");
+  const { data: allProjects } = await getAllProjects();
 
   if (!allProjects) {
     return (

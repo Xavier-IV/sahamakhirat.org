@@ -2,6 +2,7 @@
 
 import { logtail } from "@/lib/logtail/server";
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -180,5 +181,7 @@ export async function updateProject(
   });
 
   logtail.flush();
+  revalidateTag('projects');
+  revalidatePath(`/project/${projectId}`);
   redirect("/dashboard");
 }

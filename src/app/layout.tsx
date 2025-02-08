@@ -22,6 +22,7 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col">
           <div className="max-w-7xl mx-auto w-full">{children}</div>
         </div>
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="824d5511-2dfe-438c-9565-a69f6679bafc"></script>
       </body>
     </html>
   );

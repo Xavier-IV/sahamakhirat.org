@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { ProjectsQuery } from "../page";
 import { AvatarGroup } from "./avatar-group";
 import Image from "next/image";
+import { ProjectsQuery } from "@/lib/queries/project";
 
 type ProjectCardProps = {
   project: ProjectsQuery[number];

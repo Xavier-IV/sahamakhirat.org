@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [
@@ -46,6 +47,10 @@ export default withSentryConfig(nextConfig, {
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
+
+  sourcemaps: {
+    disable: true,
+  },
 
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/

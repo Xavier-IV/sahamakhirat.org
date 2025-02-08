@@ -2,6 +2,7 @@
 
 import { logtail } from "@/lib/logtail/server";
 import { createClient } from "@/lib/supabase/server";
+import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -178,5 +179,7 @@ export async function createProject(
   logtail.info("Project created successfully", { projectName, userId });
 
   logtail.flush();
+  revalidateTag('project');
+  revalidateTag('projects');
   redirect("/dashboard");
 }

@@ -1,25 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
-import { QueryData } from "@supabase/supabase-js";
 import Link from "next/link";
 import { Header } from "./components/header";
 import { ProjectCard } from "./components/project-card";
+import { getProjects } from "@/lib/queries/project";
 
 export const dynamic = "force-dynamic";
-
-const supabase = createClient();
-const projectsQuery = supabase
-  .from("projects")
-  .select(
-    "id, title, description, image_url, website, readme, contributors(*), maintainers(*)",
-    {
-      count: "exact",
-    },
-  )
-  .eq("is_approved", true)
-  .order("created_at", { ascending: true });
-
-export type ProjectsQuery = QueryData<typeof projectsQuery>;
 
 export default async function Home({
   searchParams,
@@ -33,11 +18,12 @@ export default async function Home({
   const start = (page - 1) * limit;
   const end = start + limit - 1;
 
+
   const {
     data: projects,
     count,
     error,
-  } = await projectsQuery.range(start, end);
+  } = await getProjects(start, end);
 
   if (error) throw new Error(error.message);
 
