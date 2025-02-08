@@ -2,7 +2,6 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   /* config options here */
   experimental: {
@@ -10,7 +9,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
-  
+  cacheMaxMemorySize: 100 * 1024 * 1024, // 100mb in bytes
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [

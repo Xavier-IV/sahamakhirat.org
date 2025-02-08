@@ -16,7 +16,8 @@ export default async function ProjectPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { data: project, error } = await getOneProject(id);
+  const projectRes = await getOneProject(id);
+  const { data: project, error } = await projectRes();
 
   if (error || !project) {
     return <div className="text-center text-red-500">Project not found</div>;

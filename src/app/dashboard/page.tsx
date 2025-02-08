@@ -34,9 +34,14 @@ export default async function Dashboard() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Projects</h1>
-          <Button asChild>
-            <Link href="/dashboard/project/new">Add New Project</Link>
-          </Button>
+          <div className="flex space-x-4">
+            <Button asChild>
+              <Link href="/dashboard/project/new">Add New Project</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/api/token" target="_blank">Get Token</Link>
+            </Button>
+          </div>
         </div>
         {userProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
