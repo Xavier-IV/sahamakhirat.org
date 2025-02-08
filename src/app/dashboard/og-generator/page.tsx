@@ -1,8 +1,8 @@
 import { Header } from '@/app/components/header';
-import OGGeneratorClient from './og-generator-client';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Link from 'next/link';
+import OGGeneratorClient from './og-generator-client';
 
 const OGGeneratorPage = async () => {
 	return (
