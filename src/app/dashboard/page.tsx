@@ -39,7 +39,7 @@ export default async function Dashboard() {
               <Link href="/dashboard/project/new">Add New Project</Link>
             </Button>
             <Button asChild variant="secondary">
-              <Link href="/api/token" target="_blank">Get Token</Link>
+              <Link href="/dashboard/og-generator">OG Generator</Link>
             </Button>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { v4 as uuidv4 } from "uuid";
 import { logtail } from "@/lib/logtail/server";
 
-export async function GET(request: Request) {
+export async function GET() {
 	try {
 		const supabase = await createClient();
 		const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 		const token = uuidv4();
 		const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
 
-		const { data, error } = await supabase
+		const { error } = await supabase
 			.from('developer_tokens')
 			.insert([{ token, user_id: user.id, expires_at: expiresAt }]);
 

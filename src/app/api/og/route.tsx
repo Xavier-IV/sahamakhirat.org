@@ -47,34 +47,11 @@ const SampleComponent = ({ url, title, description, screenshot }: { url: string;
 export async function GET(request: Request) {
 	try {
 		const supabase = await createClient();
-		const token = new URL(request.url).searchParams.get('token');
 
-		const { data: user, error: userError } = await supabase.auth.getUser();
+		const { data: user } = await supabase.auth.getUser();
 
 		if (!user) {
 			return new Response("Unauthorized", { status: 401 });
-		}
-
-		if (!token) {
-			return new Response("Token is required", { status: 401 });
-		}
-
-		const { data, error } = await supabase
-			.from('developer_tokens')
-			.select('*')
-			.eq('token', token)
-			.single();
-
-		if (error || !data) {
-			return new Response("Invalid or expired token", { status: 401 });
-		}
-
-		const now = new Date();
-		const expiresAt = new Date(data.expires_at);
-
-		// Ensure both dates are in the same time zone
-		if (expiresAt.getTime() > now.getTime()) {
-			return new Response("Expired token. You can request a new one in the dashboard.", { status: 401 });
 		}
 
 		logtail.info("OG image requested");
